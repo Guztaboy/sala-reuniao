@@ -28,7 +28,45 @@
       font-family:'Segoe UI',system-ui,sans-serif;overflow:hidden}
 
     /* LAYOUT — 4 colunas: conteúdo | divider | próximas | qrcode */
-    .screen{display:grid;grid-template-rows:auto 1fr;height:100vh;padding:2.8vw 3.5vw;gap:2.5vh}
+    .screen{display:grid;grid-template-rows:auto 1fr auto;height:100vh;padding:2.8vw 3.5vw;gap:2.5vh}
+
+    /* CARROSSEL DE FOTOS */
+    .carousel-footer{
+      /* Quebra o padding lateral da .screen para ir de borda a borda */
+      margin-left:-3.5vw;
+      margin-right:-3.5vw;
+      margin-bottom:-2.8vw;
+      width:calc(100% + 7vw);
+      overflow:hidden;
+      height:5vh;
+      position:relative;
+      flex-shrink:0;
+    }
+    .carousel-track-wrap{
+      display:flex;
+      width:100%;
+      height:100%;
+      overflow:hidden;
+    }
+    .carousel-track{
+      display:flex;
+      flex-shrink:0;
+      height:100%;
+      gap:60px;
+      animation:carousel-scroll 30s linear infinite;
+      will-change:transform;
+    }
+    .carousel-track img{
+      height:100%;
+      width:auto;
+      object-fit:cover;
+      flex-shrink:0;
+      display:block;
+    }
+    @keyframes carousel-scroll{
+      0%  { transform:translateX(0); }
+      100%{ transform:translateX(-50%); }
+    }
     header{display:flex;justify-content:space-between;align-items:flex-start;
       border-bottom:1px solid var(--border);padding-bottom:2.2vh}
     .room-info{display:flex;flex-direction:column;gap:.6vh}
@@ -202,9 +240,18 @@
       </div>
     </div>
   </div>
+
+  <!-- Carrossel de fotos -->
+  <div class="carousel-footer">
+    <div class="carousel-track-wrap">
+      <div class="carousel-track" id="carouselTrack">
+        <!-- As imagens são inseridas via JavaScript pelo CONFIG.carouselImages -->
+      </div>
+    </div>
+  </div>
 </div>
 
-<div class="watermark">AO VIVO</div>
+<div class="watermark"></div>
 
 <script>
 var CONFIG = {
@@ -226,7 +273,18 @@ var CONFIG = {
 
   // URL da imagem do logo da empresa
   // Ex: "https://suaempresa.com/logo.png"
-  logoUrl: "https://globalsrv.com.br/wp-content/uploads/2023/02/Logo_60px_white.png"
+  logoUrl: "https://globalsrv.com.br/wp-content/uploads/2023/02/Logo_60px_white.png",
+
+  // URLs das fotos do carrossel 
+  carouselImages: [
+    "https://uhf.microsoft.com/images/microsoft/RE1Mu3b.png",
+    "https://static.wixstatic.com/media/f56532_95e4890eb80177443329b6b98f17e796.png/v1/fill/w_184,h_44,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/LuminaITtransparentSimples.png",
+    "https://globalsrv.com.br/wp-content/uploads/2025/06/GLPI-300x128.png",
+    "https://globalsrv.com.br/wp-content/uploads/2025/02/Clicksign-300x73.png",
+    "https://d28cbrkfwlvknk.cloudfront.net/images/logoAutodoc2025_e77f483.svg",
+    "https://hr.solides.com/statics/logo_solides_rebranding.svg",
+    "https://www.controlid.com.br/assets/images/logo.webp"
+  ]
 };
 
 firebase.initializeApp(CONFIG.firebase);
@@ -353,6 +411,42 @@ function renderMeetings(docs){
 db.collection(CONFIG.colecao)
   .onSnapshot(function(snap){ renderMeetings(snap.docs); },
               function(err){ showError(err.message); });
+
+/* Carrossel de fotos */
+(function(){
+  var track = document.getElementById('carouselTrack');
+  var imgs = CONFIG.carouselImages || [];
+  if(!imgs.length) {
+    document.querySelector('.carousel-footer').style.display = 'none';
+    return;
+  }
+  // Duplica as imagens para criar o loop contínuo sem espaços
+  var doubled = imgs.concat(imgs);
+  doubled.forEach(function(src){
+    var img = document.createElement('img');
+    img.src = src;
+    img.alt = '';
+    img.draggable = false;
+    track.appendChild(img);
+  });
+
+  // Após carregar as imagens, ajusta a duração da animação
+  // proporcional à largura total para velocidade constante
+  var loaded = 0;
+  var allImgs = track.querySelectorAll('img');
+  function checkReady(){
+    loaded++;
+    if(loaded >= allImgs.length){
+      var halfW = track.scrollWidth / 2;
+      var speed = halfW / 80; // px por segundo
+      track.style.animationDuration = speed + 's';
+    }
+  }
+  allImgs.forEach(function(img){
+    if(img.complete) checkReady();
+    else { img.addEventListener('load', checkReady); img.addEventListener('error', checkReady); }
+  });
+})();
 
 setInterval(function(){
   db.collection(CONFIG.colecao).get().then(function(snap){ renderMeetings(snap.docs); });
