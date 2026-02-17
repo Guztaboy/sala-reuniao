@@ -179,7 +179,7 @@
 <div class="screen">
   <header>
     <div class="room-info">
-      <span class="room-label">Sala de Reuniao</span>
+      <span class="room-label">Sala de Reunião</span>
       <span class="room-name" id="roomName">Carregando...</span>
       <span class="status-badge free" id="statusBadge">
         <span class="status-dot"></span>
@@ -198,7 +198,7 @@
       <span class="section-label">Em andamento</span>
       <div class="now-card empty" id="nowCard">
         <div class="free-icon" id="freeIcon">📋</div>
-        <span class="empty-msg" id="nowEmpty">Nenhuma reuniao<br>em andamento</span>
+        <span class="empty-msg" id="nowEmpty">Nenhuma reunião<br>em andamento</span>
         <div id="nowContent" style="display:none;flex-direction:column;gap:2vh">
           <div class="now-title" id="nowTitle"></div>
           <div class="now-time-row">
@@ -218,7 +218,7 @@
     <div class="next-section">
       <span class="section-label">Proximas reuniões</span>
       <div class="meetings-list" id="meetingsList">
-        <div class="no-meetings"><span>📅</span>Nenhuma reuniao agendada</div>
+        <div class="no-meetings"><span>📅</span>Nenhuma reunião agendada</div>
       </div>
     </div>
 
@@ -235,7 +235,7 @@
         <div class="qr-canvas" id="qrCanvas">
           <div class="qr-placeholder" id="qrPlaceholder">Configure o link no CONFIG.qrUrl</div>
         </div>
-        <div class="qr-label">Agende sua reuniao</div>
+        <div class="qr-label">Agende sua reunião</div>
         <div class="qr-sublabel">Escaneie o<br>QR Code</div>
       </div>
     </div>
@@ -393,7 +393,7 @@ function renderMeetings(docs){
   var upcoming=meetings.filter(function(m){ return m._s>now; }).slice(0,6);
   var list=document.getElementById('meetingsList');
   if(!upcoming.length){
-    list.innerHTML='<div class="no-meetings"><span>📅</span>Nenhuma reuniao agendada para hoje</div>';
+    list.innerHTML='<div class="no-meetings"><span>📅</span>Nenhuma reunião agendada para hoje</div>';
   } else {
     list.innerHTML=upcoming.map(function(m){
       var org=fmtOrganizer(m.organizer);
